@@ -44,6 +44,7 @@ add_executable(${PROJECT_NAME} main.c
         lib/aht20/aht20.c # AHT20 sensor library
         lib/bmp280/bmp280.c # BMP280 sensor library
         lib/sensors/sensors.c # Sensor management library
+        lib/rfm95.c
 )
 
 pico_set_program_name(Tarefa_13_2_Lora "Tarefa_13_2_Lora")
@@ -74,7 +75,7 @@ target_link_libraries(Tarefa_13_2_Lora
         hardware_clocks
         hardware_adc
         hardware_pwm
-
+        hardware_spi
         )
 
 pico_add_extra_outputs(Tarefa_13_2_Lora)

@@ -10,7 +10,7 @@
 #define I2C_PORT i2c0
 #define I2C_SDA 0
 #define I2C_SCL 1
-#define SEA_LEVEL_PRESSURE 102100.0
+#define SEA_LEVEL_PRESSURE 101400.0
 
 typedef struct {
     float bmp_temp;

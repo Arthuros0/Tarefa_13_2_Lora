@@ -11,6 +11,7 @@
 #include "lib/bmp280/bmp280.h"
 #include "lib/sensors/sensors.h"
 #include "pico/bootrom.h"
+#include "lib/rfm95.h"
 
 ssd1306_t ssd; // Declaração do display OLED
 SensorReadings readings;
@@ -41,7 +42,7 @@ int main()
         while (true)
         {
             tx_operation_mode();
-            sleep_ms(1000);
+            sleep_ms(300);
         }
     
     }else if(rx_mode){
@@ -68,10 +69,26 @@ void tx_operation_mode(){
     readings=get_sensor_readings();
     display_data();
     //Falta implementar envio via Lora
+
+    // Formata os dados em uma única string
+    char msg[100];
+    snprintf(msg, sizeof(msg), "%.1f,%.1f,%.1f,%.1f", readings.bmp_temp, readings.altitude_m, readings.aht_temp, readings.humidity);
+    rfm95_send_data(msg);
 }
 
 void rx_operation_mode(){
-    //Falta implementar recebimento dos dados e armazenamento em struct
+    char msg[100];
+    rfm95_rx_mode();
+    if (rfm95_receive_data(msg, sizeof(msg) - 1)) {
+        // Processa a mensagem recebida
+        printf("Mensagem recebida: %s\n", msg);
+        
+        // Aqui você pode fazer o parsing da mensagem e atualizar a struct readings se necessário
+        // Exemplo de parsing simples:
+        sscanf(msg, "%f,%f,%f,%f", &readings.bmp_temp, &readings.altitude_m, &readings.aht_temp, &readings.humidity);
+    } else {
+        printf("Nenhuma mensagem recebida.\n");
+    }
     display_data();
 }
 
@@ -93,19 +110,22 @@ void setup_lora_mode(){
     gpio_set_irq_enabled(BUTTON_B, GPIO_IRQ_EDGE_FALL, false);
 
 
+    rfm95_init(); // Inicializa o módulo RFM95
+    
+
     if (tx_mode)
     {
         init_i2c_sensor();
         init_bmp280();
         init_aht20();
         desenha_frame(status,0);
-        //Falta a configuração do modo TX
+        
+        rfm95_set_power(17); // Configura potência máxima
         
     }else if(rx_mode){
 
         desenha_frame(status,1);
         //Falta a configuração do modo RX
-
     }
     
     set_led_green();
