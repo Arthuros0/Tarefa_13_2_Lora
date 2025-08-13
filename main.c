@@ -11,7 +11,7 @@
 #include "lib/bmp280/bmp280.h"
 #include "lib/sensors/sensors.h"
 #include "pico/bootrom.h"
-#include "lib/rfm95.h"
+#include "lib/rfm95/rfm95.h"
 
 ssd1306_t ssd; // Declaração do display OLED
 SensorReadings readings;
@@ -68,7 +68,6 @@ void init_peripherals(){
 void tx_operation_mode(){
     readings=get_sensor_readings();
     display_data();
-    //Falta implementar envio via Lora
 
     // Formata os dados em uma única string
     char msg[100];
@@ -83,8 +82,6 @@ void rx_operation_mode(){
         // Processa a mensagem recebida
         printf("Mensagem recebida: %s\n", msg);
         
-        // Aqui você pode fazer o parsing da mensagem e atualizar a struct readings se necessário
-        // Exemplo de parsing simples:
         sscanf(msg, "%f,%f,%f,%f", &readings.bmp_temp, &readings.altitude_m, &readings.aht_temp, &readings.humidity);
     } else {
         printf("Nenhuma mensagem recebida.\n");
@@ -94,7 +91,6 @@ void rx_operation_mode(){
 
 void setup_lora_mode(){
     
-    //Falta inicialização do SPI e Lora
     set_led_yellow();
     display_startup_message();
     
@@ -125,7 +121,6 @@ void setup_lora_mode(){
     }else if(rx_mode){
 
         desenha_frame(status,1);
-        //Falta a configuração do modo RX
     }
     
     set_led_green();
